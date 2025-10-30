@@ -46,6 +46,7 @@ class LoginActivity : AppCompatActivity() {
         // Inicializa o Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance()
 
+        // As chamadas findViewById estão OK.
         emailEditText = findViewById(R.id.edit_text_email)
         passwordEditText = findViewById(R.id.edit_text_password)
         loginButton = findViewById(R.id.button_login)
@@ -100,7 +101,15 @@ class LoginActivity : AppCompatActivity() {
         if (user != null) {
             // Navegue para a proxima atividade
             val intent = Intent(applicationContext, MainActivity::class.java)
+
+
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
             startActivity(intent)
+
+            // OBRIGATÓRIO: Fechar a Activity de Login
+            finish()
+
         } else {
             Toast.makeText(
                 applicationContext,

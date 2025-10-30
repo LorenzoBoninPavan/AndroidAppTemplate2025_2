@@ -1,4 +1,4 @@
-package com.ifpr.androidapptemplate.ui.dashboard
+package com.ifpr.androidapptemplate.ui.adicionar
 
 import android.location.Geocoder
 import android.os.Bundle
@@ -8,20 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.lifecycleScope // Para rodar o Geocoding assíncrono
 import com.ifpr.androidapptemplate.ItemMarketplace // Sua classe de dados
-import com.ifpr.androidapptemplate.databinding.FragmentDashboardBinding // O Binding do seu layout
+import com.ifpr.androidapptemplate.databinding.FragmentAdicionarItemBinding // O Binding do seu layout
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers // Para threads em segundo plano
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.Locale
 
-class DashboardFragment : Fragment() {
+class AdicionarItemFragment : Fragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
+    private var _binding: FragmentAdicionarItemBinding? = null
     // Usa o View Binding para acessar os elementos do layout
     private val binding get() = _binding!!
 
@@ -32,8 +32,7 @@ class DashboardFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inicialização do binding para fragment_dashboard.xml
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentAdicionarItemBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -43,8 +42,7 @@ class DashboardFragment : Fragment() {
         // Inicializa a referência ao Firebase Realtime Database
         database = FirebaseDatabase.getInstance().getReference("itens_marketplace")
 
-        // 💡 Listener para o botão Salvar
-        // O ID foi alterado no XML para 'botaoSalvar'
+        // Define o Listener para o botão Salvar
         binding.botaoSalvar.setOnClickListener {
             salvarItem()
         }
@@ -70,12 +68,13 @@ class DashboardFragment : Fragment() {
         lifecycleScope.launch {
             Toast.makeText(context, "Buscando coordenadas, aguarde...", Toast.LENGTH_SHORT).show()
 
+            // 💡 Converte o endereço para Lat/Lng
             val (latitude, longitude) = buscarCoordenadas(endereco)
 
             if (latitude != 0.0 || longitude != 0.0) {
                 // 3. Monta o ItemMarketplace com as coordenadas
                 val novoItem = ItemMarketplace(
-                    id = null,
+                    id = null, // O Firebase gera o ID com .push()
                     nome = nome,
                     endereco = endereco,
                     descricao = descricao,
@@ -94,6 +93,7 @@ class DashboardFragment : Fragment() {
 
     /**
      * Converte o endereço de String para coordenadas (Latitude e Longitude).
+     * Esta função é suspensa e roda na thread de I/O.
      */
     private suspend fun buscarCoordenadas(endereco: String): Pair<Double, Double> =
         withContext(Dispatchers.IO) {
@@ -108,8 +108,10 @@ class DashboardFragment : Fragment() {
                     return@withContext Pair(address.latitude, address.longitude)
                 }
             } catch (e: IOException) {
+                // Captura erros de rede ou serviço indisponível
                 Log.e("GEOCODING", "Serviço de Geocoding indisponível: ${e.message}")
             }
+            // Retorna 0.0, 0.0 em caso de falha
             return@withContext Pair(0.0, 0.0)
         }
 
@@ -117,6 +119,7 @@ class DashboardFragment : Fragment() {
      * Salva o objeto ItemMarketplace no Firebase.
      */
     private fun salvarNoDatabase(item: ItemMarketplace) {
+        // .push() gera uma chave única (ID) para o item e o salva
         database.push().setValue(item)
             .addOnSuccessListener {
                 Toast.makeText(context, "Item cadastrado com sucesso!", Toast.LENGTH_SHORT).show()

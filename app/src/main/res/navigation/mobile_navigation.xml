@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -28,4 +30,22 @@
         android:name="com.ifpr.androidapptemplate.ui.usuario.PerfilUsuarioFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_perfil_usuario" />
+
+    <fragment
+        android:id="@+id/nav_mapa_item"
+        android:name="com.ifpr.androidapptemplate.ui.mapa.MapItemFragment"
+        android:label="Localização do Item"
+        tools:layout="@layout/fragment_mapa_item">
+
+        <argument
+            android:name="item_latitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+
+        <argument
+            android:name="item_longitude"
+            app:argType="float"
+            android:defaultValue="0.0" />
+    </fragment>
+
 </navigation>
