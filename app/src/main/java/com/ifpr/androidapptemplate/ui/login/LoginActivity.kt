@@ -41,10 +41,17 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Inicializar FirebaseApp (Boa prática, mas já deve estar no seu Manifest)
         FirebaseApp.initializeApp(this)
 
-        // Inicializa o Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance()
+
+        // Verifica se o usuário já está logado e navega diretamente.
+        // Esta lógica está correta, mas pode estar sendo disparada ANTES do token ser 100% válido.
+        if (firebaseAuth.currentUser != null) {
+            updateUI(firebaseAuth.currentUser)
+            return
+        }
 
         emailEditText = findViewById(R.id.edit_text_email)
         passwordEditText = findViewById(R.id.edit_text_password)
@@ -62,8 +69,13 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginButton.setOnClickListener {
-            val email = emailEditText.text.toString()
-            val password = passwordEditText.text.toString()
+            val email = emailEditText.text.toString().trim()
+            val password = passwordEditText.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             signIn(email, password)
         }
 
@@ -86,27 +98,34 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success")
+                    // Chamada correta: A navegação só ocorre após o sucesso do login.
                     updateUI(firebaseAuth.currentUser)
                 } else {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
+                    Toast.makeText(baseContext, "Falha na autenticação. Verifique suas credenciais.",
                         Toast.LENGTH_SHORT).show()
-                    updateUI(null)
+                    // Não chame updateUI(null) aqui, pois ele exibe um Toast duplicado.
                 }
             }
     }
 
+    /**
+     * Funcao crucial que inicia a MainActivity e limpa a pilha de atividades.
+     */
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
             // Navegue para a proxima atividade
             val intent = Intent(applicationContext, MainActivity::class.java)
+
+            // CORREÇÃO: Limpa todas as atividades anteriores e faz da MainActivity a raiz
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
             startActivity(intent)
+            finish() // Garante que a LoginActivity seja fechada
         } else {
-            Toast.makeText(
-                applicationContext,
-                "Email ou senha incorretos",
-                Toast.LENGTH_SHORT
-            ).show()
+            // CORREÇÃO: Removido o Toast redundante de "Email ou senha incorretos",
+            // pois a falha de login já mostra um Toast no signIn().
+            Log.d(TAG, "updateUI: Usuário nulo. Permanecendo no Login.")
         }
     }
 
@@ -120,13 +139,12 @@ class LoginActivity : AppCompatActivity() {
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Login bem-sucedido, navegar para a atividade principal ou atualizar UI
                     Log.d(TAG, "signInWithGoogle:success")
+                    // Chamada correta: A navegação só ocorre após o sucesso do login.
                     updateUI(firebaseAuth.currentUser)
                 } else {
-                    // Tratar falha de login
                     Log.w(TAG, "signInWithGoogle:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
+                    Toast.makeText(baseContext, "Falha na autenticação Google.",
                         Toast.LENGTH_SHORT).show()
                     updateUI(null)
                 }
@@ -143,6 +161,9 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
                 // Tratar falha de login
+                Log.w(TAG, "Google sign in failed", e)
+                Toast.makeText(baseContext, "Login com Google falhou. Código: ${e.statusCode}",
+                    Toast.LENGTH_SHORT).show()
             }
         }
     }

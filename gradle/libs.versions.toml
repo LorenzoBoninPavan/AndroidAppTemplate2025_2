@@ -13,6 +13,7 @@ lifecycleViewmodelKtx = "2.9.2"
 navigationFragmentKtx = "2.9.3"
 navigationUiKtx = "2.9.3"
 
+# Dependências Firebase existentes
 firebaseCommonKtx = "21.0.0"
 firebaseDatabaseKtx = "21.0.0"
 firebaseAuthKtx = "23.2.0"
@@ -22,6 +23,10 @@ playServicesAuth = "21.3.0"
 firebaseFirestoreKtx = "25.1.4"
 firebaseCrashlyticsBuildtools = "3.0.3"
 firebaseAi = "17.5.0"
+
+# Dependências de IA e JSON (ADIÇÕES)
+gson = "2.10.1" # Versão do Gson
+geminiAi = "0.8.0" # Versão do SDK do Google Generative AI
 
 glide = "4.16.0"
 
@@ -41,6 +46,13 @@ androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecy
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+
+# ADIÇÃO: GSON para desserialização de JSON
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# ADIÇÃO: SDK Oficial do Gemini para geração de conteúdo
+gemini-ai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "geminiAi" }
+
 
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
@@ -65,4 +77,3 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
