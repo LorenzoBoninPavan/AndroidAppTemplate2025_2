@@ -6,6 +6,10 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#D7CCC8"
+
+    android:fitsSystemWindows="true"
+
     tools:context=".MainActivity">
 
     <fragment
@@ -25,7 +29,14 @@
         android:id="@+id/nav_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+
+        android:background="#3E2723"
+        app:itemIconTint="#F7F7D8"
+        app:itemTextColor="?attr/colorOnSurface"
+
+        android:layout_marginBottom="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
