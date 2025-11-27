@@ -19,7 +19,6 @@ class CharacterDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCharacterDetailBinding
     private lateinit var auth: FirebaseAuth
-    // ⚠️ ALTERADO: Usando FirebaseDatabase (Realtime Database)
     private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
